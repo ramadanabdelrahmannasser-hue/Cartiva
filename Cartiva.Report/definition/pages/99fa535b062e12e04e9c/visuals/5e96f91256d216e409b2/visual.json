@@ -1,0 +1,76 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "5e96f91256d216e409b2",
+  "position": {
+    "x": 0,
+    "y": 465.71428571428572,
+    "z": 1000,
+    "height": 201.42857142857144,
+    "width": 684.28571428571433,
+    "tabOrder": 1000
+  },
+  "visual": {
+    "visualType": "pivotTable",
+    "query": {
+      "queryState": {
+        "Columns": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Dim_Customers"
+                    }
+                  },
+                  "Property": "Activity Churn Status"
+                }
+              },
+              "queryRef": "Dim_Customers.Activity Churn Status",
+              "nativeQueryRef": "Activity Churn Status",
+              "active": true
+            }
+          ]
+        },
+        "Rows": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Dim_Customers"
+                    }
+                  },
+                  "Property": "dynamic_churn_status"
+                }
+              },
+              "queryRef": "Dim_Customers.dynamic_churn_status",
+              "nativeQueryRef": "dynamic_churn_status",
+              "active": true
+            }
+          ]
+        },
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Dim_Customers"
+                    }
+                  },
+                  "Property": "Total users"
+                }
+              },
+              "queryRef": "Dim_Customers.Total users",
+              "nativeQueryRef": "Total users"
+            }
+          ]
+        }
+      }
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

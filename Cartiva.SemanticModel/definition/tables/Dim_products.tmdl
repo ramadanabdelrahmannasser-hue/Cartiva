@@ -1,0 +1,140 @@
+table Dim_products
+	lineageTag: af850999-c776-4e69-b033-dd8cd3e28998
+
+	measure 'Total products' = DISTINCTCOUNT(Dim_products[product_id])
+		formatString: 0
+		lineageTag: 95ad56b7-2ae6-45c6-9b77-ce67aeeb3f04
+
+	measure 'Gross Margin %' =
+			
+			-- Calculate unit profit margin percentage to identify pricing flexibility
+			DIVIDE(
+			    SUM('Dim_products'[price]) - SUM('Dim_products'[cost]),
+			    SUM('Dim_products'[price]),
+			    0
+			)
+		lineageTag: ed0ca681-d80b-4149-852e-7264e6535077
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Is Competitive Pricing Candidate' = ```
+			
+			-- Flag high-demand Premium/Core items with high margin that suffer from cart leakage
+			VAR CurrentMargin = [Gross Margin %]
+			VAR CartAdditions = 
+			    CALCULATE(
+			        COUNTROWS('Fact_Events'),
+			        'Fact_Events'[event_name] = "add_to_cart"
+			    )
+			VAR AvgCategoryAdditions = 
+			    CALCULATE(
+			        AVERAGEX(
+			            VALUES('Dim_products'[product_id]),
+			            CALCULATE(COUNTROWS('Fact_Events'), 'Fact_Events'[event_name] = "add_to_cart")
+			        ),
+			        ALLSELECTED('Dim_products')
+			    )
+			
+			RETURN
+			    IF(
+			        SELECTEDVALUE('Dim_products'[Product Price Tier]) IN {"1. Premium Assortment", "2. Core Assortment", "Premium Assortment", "Core Assortment"}
+			        && CartAdditions >= AvgCategoryAdditions
+			        && CurrentMargin >= 0.35, -- Example threshold: 35%+ margin allows selective price matching
+			        "Target for Price-Match",
+			        "Hold Standard Price"
+			    )
+			```
+		lineageTag: b393f7eb-11d3-435a-9953-93082063e65b
+
+	column product_id
+		dataType: int64
+		formatString: 0
+		lineageTag: ce65835d-07df-4756-a29e-8f032a180675
+		summarizeBy: none
+		sourceColumn: product_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column product_name
+		dataType: string
+		lineageTag: 1bc44d91-fe1a-4be8-b8e6-c82d52e99ba4
+		summarizeBy: none
+		sourceColumn: product_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column category
+		dataType: string
+		lineageTag: 1f774267-07f9-433a-b372-7abbd351c4f6
+		summarizeBy: none
+		sourceColumn: category
+
+		annotation SummarizationSetBy = Automatic
+
+	column price
+		dataType: double
+		lineageTag: ab3ab8d5-be67-48f1-bce3-0aed043d4ca4
+		summarizeBy: sum
+		sourceColumn: price
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column cost
+		dataType: double
+		lineageTag: 95cbe602-b959-4a6d-a2c0-2d8406725cf0
+		summarizeBy: sum
+		sourceColumn: cost
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Product Price Tier' = ```
+			
+			-- Retrieve the current product price
+			VAR CurrentPrice = 'Dim_products'[price]
+			
+			-- Calculate Q1 (25th Percentile) across all products in the catalog
+			VAR Price_Q1 = 
+			    CALCULATE(
+			        PERCENTILE.INC('Dim_products'[price], 0.25),
+			        ALL('Dim_products')
+			    )
+			
+			-- Calculate Q3 (75th Percentile) across all products in the catalog
+			VAR Price_Q3 = 
+			    CALCULATE(
+			        PERCENTILE.INC('Dim_products'[price], 0.75),
+			        ALL('Dim_products')
+			    )
+			
+			RETURN
+			    -- Segment products using professional retail assortment terminology
+			    SWITCH(
+			        TRUE(),
+			        ISBLANK(CurrentPrice), "Promotional / Unpriced",
+			        CurrentPrice >= Price_Q3, "Premium Assortment",
+			        CurrentPrice >= Price_Q1, "Core Assortment",
+			        "Entry-Level Assortment"
+			    )
+			```
+		lineageTag: 2e5d836e-a97f-4e82-93f5-44af18b4edc1
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Dim_products = m
+		mode: import
+		source =
+				let
+				    Source = Odbc.DataSource("dsn=Cartiva_DW", [HierarchicalNavigation=true]),
+				    ecommerce_product_analytics_dw_Database = Source{[Name="ecommerce_product_analytics_dw",Kind="Database"]}[Data],
+				    dim_products_Table = ecommerce_product_analytics_dw_Database{[Name="dim_products",Kind="Table"]}[Data],
+				  #"Marked key columns" = Table.AddKey(dim_products_Table, {"product_id"}, false)
+				in
+				    #"Marked key columns"
+
+	annotation PBI_ResultType = Table
+

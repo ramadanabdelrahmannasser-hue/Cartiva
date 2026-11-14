@@ -1,0 +1,244 @@
+table Dim_Customers
+	lineageTag: d85c803a-ac4c-40a4-8b43-594c4d1d603c
+
+	measure 'Total users' =
+			
+			DISTINCTCOUNT(Dim_Customers[user_id])
+		formatString: 0
+		lineageTag: 1c5cc095-a063-4522-a381-d30c37a0dfc2
+
+	measure 'Purchasing Users' =
+			
+			CALCULATE(
+			    DISTINCTCOUNT(Fact_Sales[user_id]),
+			    Fact_Sales[order_status] = "Completed"
+			)
+		formatString: 0
+		lineageTag: e8839ba0-bd43-4cc3-af59-f38afb7c69c9
+
+	measure 'User Purchase Rate %' =
+			
+			DIVIDE(
+			    [Purchasing Users],
+			    [Total Users]
+			)
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: a5c95d6b-3039-40e0-bf2f-b9f5da04deef
+
+	column user_id
+		dataType: int64
+		formatString: 0
+		lineageTag: 999b2962-b836-49b0-817f-d8ff19dcec44
+		summarizeBy: none
+		sourceColumn: user_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column signup_date
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 7524c9a2-e8b6-48a1-9280-5498405b8f31
+		summarizeBy: none
+		sourceColumn: signup_date
+
+		variation Variation
+			isDefault
+			relationship: 0ab161be-8795-40bc-b488-57d4d3e190ba
+			defaultHierarchy: LocalDateTable_b04e4080-509a-4286-8f32-ffc9e59d36cd.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column country
+		dataType: string
+		lineageTag: c8453670-3603-4f2a-bcae-2457d01e90c7
+		summarizeBy: none
+		sourceColumn: country
+
+		annotation SummarizationSetBy = Automatic
+
+	column acquisition_source
+		dataType: string
+		lineageTag: f578c62b-4185-463a-a01f-bca7c9f36d26
+		summarizeBy: none
+		sourceColumn: acquisition_source
+
+		annotation SummarizationSetBy = Automatic
+
+	column device_category
+		dataType: string
+		lineageTag: 5a469abf-35ac-4a25-8174-13e3d53d2122
+		summarizeBy: none
+		sourceColumn: device_category
+
+		annotation SummarizationSetBy = Automatic
+
+	column total_completed_orders
+		dataType: int64
+		formatString: 0
+		lineageTag: c0fd2f74-0700-4c84-8cf0-20e09f571fdd
+		summarizeBy: sum
+		sourceColumn: total_completed_orders
+
+		annotation SummarizationSetBy = Automatic
+
+	column total_lifetime_value
+		dataType: double
+		lineageTag: 493e6715-36b8-4e5a-a61e-8239cc496188
+		summarizeBy: sum
+		sourceColumn: total_lifetime_value
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column first_completed_date
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 9e85b4bd-3a99-4500-ac3d-56672ff46b0e
+		summarizeBy: none
+		sourceColumn: first_completed_date
+
+		variation Variation
+			isDefault
+			relationship: 80250e0e-eb9f-4a69-91a1-bf97ff08f741
+			defaultHierarchy: LocalDateTable_c8e8fc96-b69b-44ad-bf7b-53b3bb742599.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column last_completed_date
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 8f832d1f-4778-466a-8cee-dad965fcdce6
+		summarizeBy: none
+		sourceColumn: last_completed_date
+
+		variation Variation
+			isDefault
+			relationship: f2a95786-53af-41bc-b5ba-994d3749da0e
+			defaultHierarchy: LocalDateTable_51652b8e-6856-4add-9942-158055a1250d.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column recency_days
+		dataType: int64
+		formatString: 0
+		lineageTag: 763e5fad-426a-4873-900d-cff961309945
+		summarizeBy: sum
+		sourceColumn: recency_days
+
+		annotation SummarizationSetBy = Automatic
+
+	column benchmark_median
+		dataType: double
+		lineageTag: a708a743-9a51-49a4-a978-5a2012653045
+		summarizeBy: sum
+		sourceColumn: benchmark_median
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column dynamic_churn_status
+		dataType: string
+		lineageTag: b18b1ddb-53d2-4579-9962-a479235e59e8
+		summarizeBy: none
+		sourceColumn: dynamic_churn_status
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Customer Spending Tier' = ```
+			
+			-- Calculate Average Order Value (AOV) per customer for completed orders
+			VAR UserAOV = 
+			    DIVIDE(
+			        'Dim_Customers'[total_lifetime_value], 
+			        'Dim_Customers'[total_completed_orders], 
+			        0
+			    )
+			
+			-- Calculate Q1 (25th Percentile) across active buyers only
+			VAR Q1_Threshold = 
+			    CALCULATE(
+			        PERCENTILEX.INC(
+			            FILTER('Dim_Customers', 'Dim_Customers'[total_completed_orders] > 0),
+			            DIVIDE('Dim_Customers'[total_lifetime_value], 'Dim_Customers'[total_completed_orders], 0),
+			            0.25
+			        ),
+			        ALL('Dim_Customers')
+			    )
+			
+			-- Calculate Q3 (75th Percentile) across active buyers only
+			VAR Q3_Threshold = 
+			    CALCULATE(
+			        PERCENTILEX.INC(
+			            FILTER('Dim_Customers', 'Dim_Customers'[total_completed_orders] > 0),
+			            DIVIDE('Dim_Customers'[total_lifetime_value], 'Dim_Customers'[total_completed_orders], 0),
+			            0.75
+			        ),
+			        ALL('Dim_Customers')
+			    )
+			
+			RETURN
+			    -- Classify customers into statistical Quartile tiers based on purchasing power
+			    SWITCH(
+			        TRUE(),
+			        'Dim_Customers'[total_completed_orders] = 0, " Non-Buyer",
+			        UserAOV >= Q3_Threshold, "VIP / High Spender ",
+			        UserAOV >= Q1_Threshold, "Mid-Tier / Standard ",
+			        "Budget / Price-Sensitive "
+			    )
+			```
+		lineageTag: e1f023ce-9784-415a-bc07-332d59d18a9c
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Activity Churn Status' = ```
+			
+			VAR CurrentUserID = 'Dim_Customers'[user_id]
+			-- Force filtering dim_sessions by the current row's user_id even if relationship is inactive
+			VAR LastSessionDate = 
+			    CALCULATE(
+			        MAX('dim_sessions'[session_start]),
+			        FILTER(
+			            ALL('dim_sessions'),
+			            'dim_sessions'[user_id] = CurrentUserID
+			        )
+			    )
+			VAR SnapshotDate = DATE(2026, 6, 30)
+			VAR DaysSinceLastSession = DATEDIFF(DATEVALUE(LastSessionDate), SnapshotDate, DAY)
+			VAR MedianBenchmark = 'Dim_Customers'[benchmark_median]
+			
+			RETURN
+			    SWITCH(
+			        TRUE(),
+			        ISBLANK(LastSessionDate), "No Activity",
+			        DaysSinceLastSession < MedianBenchmark, "Active Browser",
+			        DaysSinceLastSession <= (MedianBenchmark * 2), "At-Risk Browser",
+			        "Activity Churned"
+			    )
+			```
+		lineageTag: 2f944357-0d17-41d0-a8c1-3a062b2da06c
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Dim_Customers = m
+		mode: import
+		source =
+				let
+				    Source = Odbc.DataSource("dsn=Cartiva_DW", [HierarchicalNavigation=true]),
+				    ecommerce_product_analytics_dw_Database = Source{[Name="ecommerce_product_analytics_dw",Kind="Database"]}[Data],
+				    vw_dim_users_enriched_View = ecommerce_product_analytics_dw_Database{[Name="vw_dim_users_enriched",Kind="View"]}[Data],
+				  #"Marked key columns" = Table.AddKey(vw_dim_users_enriched_View, {"user_id"}, false)
+				in
+				    #"Marked key columns"
+
+	annotation PBI_ResultType = Table
+

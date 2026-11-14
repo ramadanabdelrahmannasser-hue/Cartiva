@@ -1,0 +1,167 @@
+table Fact_Sales
+	lineageTag: 9d9c0cba-b182-4f4c-988b-39e740f57563
+
+	measure 'Total Revenue' =
+			
+			CALCULATE(
+			    SUM(Fact_Sales[line_amount]),
+			    Fact_Sales[order_status] = "Completed"
+			)
+		formatString: 0
+		lineageTag: ba3a9c86-3db7-4a0b-b227-a0b68bbb10f9
+
+	measure 'Completed Orders' =
+			
+			CALCULATE(
+			    DISTINCTCOUNT(Fact_Sales[order_id]),
+			    Fact_Sales[order_status] = "Completed"
+			)
+		formatString: 0
+		lineageTag: 32524487-1b74-44c2-95ce-b16f5848717e
+
+	measure 'Average Order Value' =
+			
+			DIVIDE(
+			    [Total Revenue],
+			    [Completed Orders]
+			)
+		lineageTag: ad28dfc6-5425-403c-aaf2-dabf78f1d89c
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Measure
+		lineageTag: cf37074d-c411-4549-b419-7b876d5b37ca
+
+		annotation 43dbc3e8-3a1c-4b6f-9923-b49ff7d6691c = True
+
+	column order_item_id
+		dataType: int64
+		formatString: 0
+		lineageTag: 5cab7570-8c3a-4375-b789-ee67ff16feb0
+		summarizeBy: sum
+		sourceColumn: order_item_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column order_id
+		dataType: int64
+		formatString: 0
+		lineageTag: 57ed4959-0261-463a-8506-39eb18dfa7b5
+		summarizeBy: sum
+		sourceColumn: order_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column user_id
+		dataType: int64
+		formatString: 0
+		lineageTag: 9d10db01-2913-4bcc-944a-1ceb8f13ee53
+		summarizeBy: none
+		sourceColumn: user_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column session_id
+		dataType: int64
+		formatString: 0
+		lineageTag: 391a587b-9919-453a-ba99-0407b8fbfc5d
+		summarizeBy: none
+		sourceColumn: session_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column product_id
+		dataType: int64
+		formatString: 0
+		lineageTag: dcd172bb-5c82-487d-a2d8-010d241dd3d0
+		summarizeBy: none
+		sourceColumn: product_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column order_date
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: daa61812-dd4b-4b4e-80af-2dc0bff42641
+		summarizeBy: none
+		sourceColumn: order_date
+
+		variation Variation
+			isDefault
+			relationship: 9d7342a6-ccf8-4bb4-b204-9b7641b6d124
+			defaultHierarchy: LocalDateTable_98a7525d-29a7-4b8a-9782-c042cbbaedb9.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column order_status
+		dataType: string
+		lineageTag: e25a04da-c848-4224-a775-4f8a6274e724
+		summarizeBy: none
+		sourceColumn: order_status
+
+		annotation SummarizationSetBy = Automatic
+
+	column quantity
+		dataType: int64
+		formatString: 0
+		lineageTag: a2cdf488-da13-4a65-8e6e-45e731439336
+		summarizeBy: sum
+		sourceColumn: quantity
+
+		annotation SummarizationSetBy = Automatic
+
+	column unit_price
+		dataType: double
+		lineageTag: eef211f6-ca12-4367-9ff7-d74e6219e6e0
+		summarizeBy: sum
+		sourceColumn: unit_price
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column line_amount
+		dataType: double
+		lineageTag: cd6323bc-81de-4ed0-ab46-b40a63222471
+		summarizeBy: sum
+		sourceColumn: line_amount
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column order_time
+		dataType: dateTime
+		formatString: Long Time
+		lineageTag: b162cdd1-0047-4259-8a6d-5abdff8380a0
+		summarizeBy: none
+		sourceColumn: order_time
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Time
+
+	column order_lifecycle_tag
+		dataType: string
+		lineageTag: 0d27707e-c816-4d15-9dbc-12c8b07a629b
+		summarizeBy: none
+		sourceColumn: order_lifecycle_tag
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Fact_Sales = m
+		mode: import
+		source =
+				let
+				    Source = Odbc.DataSource("dsn=Cartiva_DW", [HierarchicalNavigation=true]),
+				    ecommerce_product_analytics_dw_Database = Source{[Name="ecommerce_product_analytics_dw",Kind="Database"]}[Data],
+				    vw_fact_sales_enriched_View = ecommerce_product_analytics_dw_Database{[Name="vw_fact_sales_enriched",Kind="View"]}[Data],
+				  #"Marked key columns" = Table.AddKey(vw_fact_sales_enriched_View, {"order_item_id", "order_id"}, false),
+				  #"Reordered columns" = Table.ReorderColumns(#"Marked key columns", {"order_item_id", "order_id", "user_id", "session_id", "product_id", "order_date", "order_time", "order_status", "quantity", "unit_price", "line_amount", "order_lifecycle_tag"})
+				in
+				    #"Reordered columns"
+
+	annotation PBI_ResultType = Table
+

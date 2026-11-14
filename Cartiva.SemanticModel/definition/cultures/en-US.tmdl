@@ -1,0 +1,62 @@
+cultureInfo en-US
+
+	linguisticMetadata =
+			{
+			  "Version": "2.0.0",
+			  "Language": "en-US",
+			  "Entities": {
+			    "fact_sales.total_revenue": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Fact_Sales",
+			          "ConceptualProperty": "Total Revenue"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Total Revenue": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "dim_customers.dynamic_churn_status": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Dim_Customers",
+			          "ConceptualProperty": "dynamic_churn_status"
+			        }
+			      },
+			      "State": "Generated"
+			    },
+			    "dim_customers.activity_churn_status": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Dim_Customers",
+			          "ConceptualProperty": "Activity Churn Status"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Activity Churn Status": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    }
+			  }
+			}
+		contentType: json
+

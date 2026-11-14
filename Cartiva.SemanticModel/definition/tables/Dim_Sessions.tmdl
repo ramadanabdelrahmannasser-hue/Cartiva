@@ -1,0 +1,78 @@
+table Dim_Sessions
+	lineageTag: dc6dd57a-5ec4-4bd5-9259-aa15f02f150a
+
+	column session_id
+		dataType: int64
+		formatString: 0
+		lineageTag: bb77f9f1-6ca2-4cbf-8a8d-e565cc553c85
+		summarizeBy: none
+		sourceColumn: session_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column user_id
+		dataType: int64
+		formatString: 0
+		lineageTag: 64d0d0cb-4210-435f-be32-ff79f1c2337f
+		summarizeBy: sum
+		sourceColumn: user_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column session_start
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: fa7b0abe-f8df-495e-b1e9-f16a50ce6b00
+		summarizeBy: none
+		sourceColumn: session_start
+
+		variation Variation
+			isDefault
+			relationship: dcd39ba9-7cc7-4d48-992a-9e2bf595e8a0
+			defaultHierarchy: LocalDateTable_8c120f17-8364-40eb-9747-cfa955fc7a76.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column session_end
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: cca2009f-ec16-40a0-a110-535c8a4c8cdb
+		summarizeBy: none
+		sourceColumn: session_end
+
+		variation Variation
+			isDefault
+			relationship: bfdd7d27-34c5-4fb0-ab20-70fa365c438f
+			defaultHierarchy: LocalDateTable_1fd3704d-b3e3-4435-916b-e91a925ceca5.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column traffic_source
+		dataType: string
+		lineageTag: 08607356-64a3-4ad9-80db-b52b5e823fd3
+		summarizeBy: none
+		sourceColumn: traffic_source
+
+		annotation SummarizationSetBy = Automatic
+
+	column device_category
+		dataType: string
+		lineageTag: 9430b45b-409a-476e-b283-1a92f665714b
+		summarizeBy: none
+		sourceColumn: device_category
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Dim_Sessions = m
+		mode: import
+		source =
+				let
+				    Source = Odbc.DataSource("dsn=Cartiva_DW", [HierarchicalNavigation=true]),
+				    ecommerce_product_analytics_dw_Database = Source{[Name="ecommerce_product_analytics_dw",Kind="Database"]}[Data],
+				    dim_sessions_Table = ecommerce_product_analytics_dw_Database{[Name="dim_sessions",Kind="Table"]}[Data],
+				  #"Marked key columns" = Table.AddKey(dim_sessions_Table, {"session_id"}, false)
+				in
+				    #"Marked key columns"
+
+	annotation PBI_ResultType = Table
+

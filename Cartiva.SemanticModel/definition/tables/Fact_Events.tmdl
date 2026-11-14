@@ -1,0 +1,128 @@
+table Fact_Events
+	lineageTag: 506bda0b-24ce-4af5-bdae-5fd8dd4ea0cd
+
+	measure 'Total Sessions' =
+			
+			DISTINCTCOUNT(Fact_Events[session_id])
+		formatString: 0
+		lineageTag: 3428602a-21f1-46ee-a4fd-37d0252b3b66
+
+	column event_id
+		dataType: int64
+		formatString: 0
+		lineageTag: aebf1dd7-7301-41c0-aad6-ea72aac77abb
+		summarizeBy: sum
+		sourceColumn: event_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column session_id
+		dataType: int64
+		formatString: 0
+		lineageTag: 975f047c-9f5f-41ad-91b0-01aaf03740ba
+		summarizeBy: none
+		sourceColumn: session_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column user_id
+		dataType: int64
+		formatString: 0
+		lineageTag: 8e76dcb6-82d0-4473-9a91-f74953e4d83f
+		summarizeBy: none
+		sourceColumn: user_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column event_name
+		dataType: string
+		lineageTag: ba90f63f-db45-4c2f-8e0e-407aa78801f6
+		summarizeBy: none
+		sourceColumn: event_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column product_id
+		dataType: double
+		lineageTag: 1bfc09cb-d232-47e5-9617-751de0a84116
+		summarizeBy: none
+		sourceColumn: product_id
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column event_date
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: d4556488-5098-46ef-9086-0a68dd8438c1
+		summarizeBy: none
+		sourceColumn: event_date
+
+		variation Variation
+			isDefault
+			relationship: 46f71eed-82e2-4c81-85ca-37ba7dca87da
+			defaultHierarchy: LocalDateTable_d6511b8b-3325-44dc-8827-3de3c68aa8b8.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column event_time
+		dataType: dateTime
+		formatString: Long Time
+		lineageTag: b68f8a62-1dea-4f44-9b7e-92c0ec015c88
+		summarizeBy: none
+		sourceColumn: event_time
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Time
+
+	column funnel_step_order
+		dataType: int64
+		formatString: 0
+		lineageTag: 2f9784da-18e8-413d-ba64-b89cd337b096
+		summarizeBy: sum
+		sourceColumn: funnel_step_order
+
+		annotation SummarizationSetBy = Automatic
+
+	column event_seq_in_session
+		dataType: int64
+		formatString: 0
+		lineageTag: 99d90420-eefc-4af7-956f-69cc8038500a
+		summarizeBy: sum
+		sourceColumn: event_seq_in_session
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Event Date time'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 93bf60d5-e890-4ebd-a8f9-3e0d021cfde1
+		summarizeBy: none
+		sourceColumn: Event Date time
+
+		variation Variation
+			isDefault
+			relationship: 0a46f34f-0cdb-4f8a-9076-de86cbe5b8e6
+			defaultHierarchy: LocalDateTable_a53a7a28-3e44-4820-b47b-297647ab9462.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Fact_Events = m
+		mode: import
+		source =
+				let
+				    Source = Odbc.DataSource("dsn=Cartiva_DW", [HierarchicalNavigation=true]),
+				    ecommerce_product_analytics_dw_Database = Source{[Name="ecommerce_product_analytics_dw",Kind="Database"]}[Data],
+				    vw_fact_events_enriched_View = ecommerce_product_analytics_dw_Database{[Name="vw_fact_events_enriched",Kind="View"]}[Data],
+				  #"Marked key columns" = Table.AddKey(vw_fact_events_enriched_View, {"event_id"}, false),
+				  #"Inserted merged column" = Table.AddColumn(#"Marked key columns", "Event Date time", each Text.Combine({Text.From([event_date]), Text.From([event_time])}, " "), type text),
+				  #"Changed column type" = Table.TransformColumnTypes(#"Inserted merged column", {{"Event Date time", type datetime}})
+				in
+				    #"Changed column type"
+
+	annotation PBI_ResultType = Table
+

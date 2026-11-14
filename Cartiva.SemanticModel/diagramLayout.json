@@ -1,0 +1,125 @@
+{
+  "version": "1.1.0",
+  "diagrams": [
+    {
+      "ordinal": 0,
+      "scrollPosition": {
+        "x": 452.5274675114793,
+        "y": 0
+      },
+      "nodes": [
+        {
+          "location": {
+            "x": 1149.960199078721,
+            "y": 0
+          },
+          "nodeIndex": "Dim_Customers",
+          "nodeLineageTag": "d85c803a-ac4c-40a4-8b43-594c4d1d603c",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 586.7361085615396,
+            "y": 694.9185424400174
+          },
+          "nodeIndex": "Dim_products",
+          "nodeLineageTag": "af850999-c776-4e69-b033-dd8cd3e28998",
+          "size": {
+            "height": 200,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 42.738705264973042,
+            "y": 121.72527923966854
+          },
+          "nodeIndex": "Dim_Sessions",
+          "nodeLineageTag": "dc6dd57a-5ec4-4bd5-9259-aa15f02f150a",
+          "size": {
+            "height": 224,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 370.4816845218856,
+            "y": 296.62648874686647
+          },
+          "nodeIndex": "Fact_Events",
+          "nodeLineageTag": "506bda0b-24ce-4af5-bdae-5fd8dd4ea0cd",
+          "size": {
+            "height": 296,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 831.754984978374,
+            "y": 307.97008205642351
+          },
+          "nodeIndex": "Fact_Sales",
+          "nodeLineageTag": "9d9c0cba-b182-4f4c-988b-39e740f57563",
+          "size": {
+            "height": 328.75152724079163,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 1391.2214938137479,
+            "y": 333.00353267450311
+          },
+          "nodeIndex": "Funnel Stages",
+          "size": {
+            "height": 200,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 1632.4827885487748,
+            "y": 371.4592712200087
+          },
+          "nodeIndex": "Monthly Sales Metrics ",
+          "nodeLineageTag": "358846d7-4373-4975-afb2-5cc8c53ea7f2",
+          "size": {
+            "height": 152,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 1873.7440832838017,
+            "y": 371.4592712200087
+          },
+          "nodeIndex": "- How Healthy Is Our Customer Base?",
+          "nodeLineageTag": "02c98c6e-513f-4a51-a240-a9e0b7505743",
+          "size": {
+            "height": 152,
+            "width": 234
+          },
+          "zIndex": 0
+        }
+      ],
+      "name": "All tables",
+      "zoomValue": 79.553182037699813,
+      "pinKeyFieldsToTop": false,
+      "showExtraHeaderInfo": false,
+      "hideKeyFieldsWhenCollapsed": false,
+      "tablesLocked": false
+    }
+  ],
+  "selectedDiagram": "All tables",
+  "defaultDiagram": "All tables"
+}

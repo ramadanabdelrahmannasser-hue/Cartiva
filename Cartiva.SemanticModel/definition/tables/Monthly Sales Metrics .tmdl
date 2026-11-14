@@ -1,0 +1,48 @@
+table 'Monthly Sales Metrics '
+	lineageTag: 358846d7-4373-4975-afb2-5cc8c53ea7f2
+
+	column 'Monthly Sales Metrics '
+		lineageTag: 85bbb449-9856-46cb-a2c0-19fbfdaa7adc
+		summarizeBy: none
+		sourceColumn: [Value1]
+		sortByColumn: 'Monthly Sales Metrics  Order'
+
+		relatedColumnDetails
+			groupByColumn: 'Monthly Sales Metrics  Fields'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Monthly Sales Metrics  Fields'
+		isHidden
+		lineageTag: 10547160-48de-408c-9ca8-5c3b2e5d4a5a
+		summarizeBy: none
+		sourceColumn: [Value2]
+		sortByColumn: 'Monthly Sales Metrics  Order'
+
+		extendedProperty ParameterMetadata =
+				{
+				  "version": 3,
+				  "kind": 2
+				}
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Monthly Sales Metrics  Order'
+		isHidden
+		formatString: 0
+		lineageTag: e9bd6e80-4f34-4c5e-9900-b138f4cad7ed
+		summarizeBy: sum
+		sourceColumn: [Value3]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Monthly Sales Metrics ' = calculated
+		mode: import
+		source =
+				{
+				    ("Total Revenue", NAMEOF('Fact_Sales'[Total Revenue]), 0),
+				    ("Completed Orders", NAMEOF('Fact_Sales'[Completed Orders]), 1)
+				}
+
+	annotation PBI_Id = 798208adf9d14ce382f8e5a7817d3267
+

@@ -1,0 +1,35 @@
+model Model
+	culture: en-US
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: en-US
+	valueFilterBehavior: independent
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation __PBI_TimeIntelligenceEnabled = 1
+
+annotation PBI_QueryOrder = ["Dim_Customers","Fact_Events","Fact_Sales","Dim_products","Dim_Sessions"]
+
+annotation PBI_ProTooling = ["DevMode"]
+
+ref table Dim_Customers
+ref table DateTableTemplate_aba8e487-5f5f-4755-8040-87687a7c58d0
+ref table LocalDateTable_b04e4080-509a-4286-8f32-ffc9e59d36cd
+ref table LocalDateTable_c8e8fc96-b69b-44ad-bf7b-53b3bb742599
+ref table LocalDateTable_51652b8e-6856-4add-9942-158055a1250d
+ref table Fact_Events
+ref table LocalDateTable_d6511b8b-3325-44dc-8827-3de3c68aa8b8
+ref table Fact_Sales
+ref table LocalDateTable_98a7525d-29a7-4b8a-9782-c042cbbaedb9
+ref table Dim_products
+ref table Dim_Sessions
+ref table LocalDateTable_8c120f17-8364-40eb-9747-cfa955fc7a76
+ref table LocalDateTable_1fd3704d-b3e3-4435-916b-e91a925ceca5
+ref table 'Funnel Stages'
+ref table LocalDateTable_a53a7a28-3e44-4820-b47b-297647ab9462
+ref table 'Monthly Sales Metrics '
+ref table '- How Healthy Is Our Customer Base?'
+
+ref cultureInfo en-US
+

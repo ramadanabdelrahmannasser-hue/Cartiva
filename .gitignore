@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Power BI local state
+**/.pbi/localSettings.json
+**/.pbi/cache.abf
+
+# Local environment and data
+.env
+*.env
+*.csv
+*.xlsx
+*.parquet
+*.db
+
+# Editor and operating-system files
+.vscode/
+.DS_Store
+Thumbs.db

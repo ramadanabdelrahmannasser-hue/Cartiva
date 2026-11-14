@@ -1,0 +1,82 @@
+table '- How Healthy Is Our Customer Base?'
+	lineageTag: 02c98c6e-513f-4a51-a240-a9e0b7505743
+
+	measure 'Lifecycle Status Color' =
+			
+			VAR PurchaseStatus =
+			    SELECTEDVALUE ( Dim_Customers[dynamic_churn_status] )
+			
+			VAR ActivityStatus =
+			    SELECTEDVALUE ( Dim_Customers[Activity Churn Status] )
+			
+			VAR CurrentStatus =
+			    COALESCE ( PurchaseStatus, ActivityStatus )
+			
+			RETURN
+			    SWITCH (
+			        CurrentStatus,
+			
+			        -- Healthy
+			        "Active", "#8B9D67",
+			        "Active Browser", "#8B9D67",
+			
+			        -- Potential Risk
+			        "At-Risk", "#E05252",
+			        "At-Risk Browser", "#E05252",
+			
+			        -- Confirmed Churn
+			        "Churned", "#A61B1B",
+			        "Activity Churned", "#A61B1B",
+			
+			        -- No Purchase Conversion
+			        "Never Bought", "#C66A24",
+			
+			        "#A6A6A6"
+			    )
+		lineageTag: 192f60bf-24f8-45f4-843b-90f541ce7993
+
+	column '- How Healthy Is Our Customer Base?'
+		lineageTag: 91679155-09fb-45e7-bf9b-5f4f2442bc4e
+		summarizeBy: none
+		sourceColumn: [Value1]
+		sortByColumn: '- How Healthy Is Our Customer Base? Order'
+
+		relatedColumnDetails
+			groupByColumn: '- How Healthy Is Our Customer Base? Fields'
+
+		annotation SummarizationSetBy = Automatic
+
+	column '- How Healthy Is Our Customer Base? Fields'
+		isHidden
+		lineageTag: 75f8495e-9931-49e6-846d-8f70f8614f78
+		summarizeBy: none
+		sourceColumn: [Value2]
+		sortByColumn: '- How Healthy Is Our Customer Base? Order'
+
+		extendedProperty ParameterMetadata =
+				{
+				  "version": 3,
+				  "kind": 2
+				}
+
+		annotation SummarizationSetBy = Automatic
+
+	column '- How Healthy Is Our Customer Base? Order'
+		isHidden
+		formatString: 0
+		lineageTag: 515b69fe-7d22-48ae-9471-b3c2e5e3e44c
+		summarizeBy: sum
+		sourceColumn: [Value3]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition '- How Healthy Is Our Customer Base?' = calculated
+		mode: import
+		source =
+				{
+				    ("Activity Churn Status", NAMEOF('Dim_Customers'[Activity Churn Status]), 0),
+				    ("Purchase Churn Status", NAMEOF('Dim_Customers'[dynamic_churn_status]), 1)
+				}
+
+	annotation PBI_Id = e193788a3d0d43f09127fc91f586884b
+

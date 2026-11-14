@@ -1,0 +1,334 @@
+table 'Funnel Stages'
+	lineageTag: 40d83669-854e-41dd-8ccb-b50462058065
+
+	measure 'Funnel Sessions' =
+			
+			VAR CurrentStage =
+			    SELECTEDVALUE('Funnel Stages'[Stage])
+			
+			RETURN
+			    CALCULATE(
+			        DISTINCTCOUNT(Fact_Events[session_id]),
+			        Fact_Events[event_name] =
+			            SWITCH(
+			                CurrentStage,
+			                "Session Start", "session_start",
+			                "Page View", "page_view",
+			                "View Item", "view_item",
+			                "Add to Cart", "add_to_cart",
+			                "Begin Checkout", "begin_checkout",
+			                "Purchase", "purchase"
+			            )
+			    )
+		formatString: 0
+		displayFolder: Funnel Measures
+		lineageTag: 724de67c-79aa-4062-aebd-742902621e8e
+
+	measure 'Leakage Rate %' =
+			
+			VAR CurrentOrder =
+			    SELECTEDVALUE('Funnel Stages'[Stage Order])
+			
+			VAR CurrentSessions =
+			    [Funnel Sessions]
+			
+			VAR PreviousSessions =
+			    CALCULATE(
+			        [Funnel Sessions],
+			        FILTER(
+			            ALL('Funnel Stages'),
+			            'Funnel Stages'[Stage Order] = CurrentOrder - 1
+			        )
+			    )
+			
+			RETURN
+			    IF(
+			        CurrentOrder = 1,
+			        BLANK(),
+			        DIVIDE(
+			            PreviousSessions - CurrentSessions,
+			            PreviousSessions
+			        )
+			    )
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: Funnel Measures
+		lineageTag: 5754758a-bfe1-496a-8f3c-7d6c71691008
+
+	measure 'Funnel Conversion %' =
+			
+			DIVIDE(
+			    [Funnel Sessions],
+			    [Total Sessions]
+			)
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: Funnel Measures
+		lineageTag: 4c354cf0-e6fe-4725-949b-0a1a1e36aa25
+
+	measure 'Stage Conversion %' =
+			
+			VAR CurrentOrder =
+			    SELECTEDVALUE('Funnel Stages'[Stage Order])
+			
+			VAR PreviousStageSessions =
+			    CALCULATE(
+			        [Funnel Sessions],
+			        FILTER(
+			            ALL('Funnel Stages'),
+			            'Funnel Stages'[Stage Order] = CurrentOrder - 1
+			        )
+			    )
+			
+			RETURN
+			    IF(
+			        CurrentOrder = 1,
+			        1,
+			        DIVIDE(
+			            [Funnel Sessions],
+			            PreviousStageSessions
+			        )
+			    )
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: Funnel Measures
+		lineageTag: 19c184b8-f5cb-4521-95d6-d01b380bfcf8
+
+	measure 'Cumulative Leakage Rate %' =
+			
+			IF(
+			    ISBLANK(SELECTEDVALUE('Funnel Stages'[Stage Order])),
+			    BLANK(),
+			    1 - [Funnel Conversion %]
+			)
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: Funnel Measures
+		lineageTag: 26016aec-c89a-47fd-887a-1f5a0f839660
+
+	measure 'Avg Minutes (Cart to Checkout)' = ```
+			
+			VAR SessionSummary = 
+			    ADDCOLUMNS(
+			        VALUES('Fact_Events'[session_id]),
+			        "CartTime", CALCULATE(MIN('Fact_Events'[Event Date time]), 'Fact_Events'[event_name] = "add_to_cart"),
+			        "CheckoutTime", CALCULATE(MIN('Fact_Events'[Event Date time]), 'Fact_Events'[event_name] = "begin_checkout")
+			    )
+			VAR ValidSessions = 
+			    FILTER(
+			        SessionSummary,
+			        NOT ISBLANK([CartTime]) && 
+			        NOT ISBLANK([CheckoutTime]) && 
+			        [CheckoutTime] >= [CartTime]
+			    )
+			VAR DiffTable = 
+			    ADDCOLUMNS(
+			        ValidSessions,
+			        "DiffMinutes", DATEDIFF([CartTime], [CheckoutTime], MINUTE)
+			    )
+			RETURN
+			    AVERAGEX(DiffTable, [DiffMinutes])
+			```
+		displayFolder: Funnel Measures
+		lineageTag: 7d00f009-4572-4787-b8d3-e89c3843a454
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Leakage % (View to Cart)' = ```
+			
+			-- Count unique sessions that viewed an item
+			VAR ViewItemSessions = 
+			    CALCULATE(
+			        DISTINCTCOUNT('Fact_Events'[session_id]),
+			        'Fact_Events'[event_name] = "view_item"
+			    )
+			
+			-- Count unique sessions that added an item to the cart
+			VAR AddToCartSessions = 
+			    CALCULATE(
+			        DISTINCTCOUNT('Fact_Events'[session_id]),
+			        'Fact_Events'[event_name] = "add_to_cart"
+			    )
+			
+			RETURN
+			    -- Calculate the drop-off rate between viewing an item and adding it to cart
+			    DIVIDE(
+			        ViewItemSessions - AddToCartSessions,
+			        ViewItemSessions
+			    )
+			```
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: Funnel Measures
+		lineageTag: facf83f4-4d0c-48a3-b2d8-5725913ebaf1
+
+	measure 'Leakage % (Cart to Checkout)' = ```
+			
+			-- 1. Capture unique sessions that added items of the selected Product Price Tier to cart
+			VAR CartSessionsTable = 
+			    CALCULATETABLE(
+			        VALUES('Fact_Events'[session_id]),
+			        'Fact_Events'[event_name] = "add_to_cart"
+			    )
+			
+			VAR AddToCartSessions = 
+			    COUNTROWS(CartSessionsTable)
+			
+			-- 2. Pass those exact sessions via TREATAS to check checkout initiation, ignoring product_id NULLs at checkout
+			VAR BeginCheckoutSessions = 
+			    CALCULATE(
+			        DISTINCTCOUNT('Fact_Events'[session_id]),
+			        'Fact_Events'[event_name] = "begin_checkout",
+			        REMOVEFILTERS('Dim_products'),
+			        TREATAS(CartSessionsTable, 'Fact_Events'[session_id])
+			    )
+			
+			RETURN
+			    -- 3. Calculate the true session-level drop-off rate per product tier
+			    DIVIDE(
+			        AddToCartSessions - BeginCheckoutSessions,
+			        AddToCartSessions
+			    )
+			```
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: Funnel Measures
+		lineageTag: d572545a-dabd-44d2-aa42-d261e64b97d9
+
+	measure 'Leakage % (Entry-Level Only Cart)' = ```
+			
+			-- 1. Sessions that added Entry-Level items
+			VAR EntrySessions = 
+			    CALCULATETABLE(
+			        VALUES('Fact_Events'[session_id]),
+			        'Fact_Events'[event_name] = "add_to_cart",
+			        'Dim_products'[Product Price Tier] = "Entry-Level Assortment"
+			    )
+			
+			-- 2. Sessions that added Core or Premium items
+			VAR HigherTierSessions = 
+			    CALCULATETABLE(
+			        VALUES('Fact_Events'[session_id]),
+			        'Fact_Events'[event_name] = "add_to_cart",
+			        'Dim_products'[Product Price Tier] IN {"Core Assortment", "Premium Assortment"}
+			    )
+			
+			-- 3. Keep only sessions that added Entry-Level EXCLUSIVELY
+			VAR ExclusiveEntrySessions = EXCEPT(EntrySessions, HigherTierSessions)
+			VAR CartCount = COUNTROWS(ExclusiveEntrySessions)
+			
+			-- 4. Count how many of these exclusive sessions reached checkout
+			VAR CheckoutCount = 
+			    CALCULATE(
+			        DISTINCTCOUNT('Fact_Events'[session_id]),
+			        'Fact_Events'[event_name] = "begin_checkout",
+			        REMOVEFILTERS('Dim_products'),
+			        TREATAS(ExclusiveEntrySessions, 'Fact_Events'[session_id])
+			    )
+			
+			RETURN
+			    DIVIDE(CartCount - CheckoutCount, CartCount)
+			```
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: Funnel Measures
+		lineageTag: 25d0780f-09bd-46d7-ba55-bd0d646656a2
+
+	measure 'Leakage % (Mixed Entry + Higher Tier Cart)' = ```
+			
+			-- 1. Sessions that added Entry-Level items
+			VAR EntrySessions = 
+			    CALCULATETABLE(
+			        VALUES('Fact_Events'[session_id]),
+			        'Fact_Events'[event_name] = "add_to_cart",
+			        'Dim_products'[Product Price Tier] = "Entry-Level Assortment"
+			    )
+			
+			-- 2. Sessions that added Core or Premium items
+			VAR HigherTierSessions = 
+			    CALCULATETABLE(
+			        VALUES('Fact_Events'[session_id]),
+			        'Fact_Events'[event_name] = "add_to_cart",
+			        'Dim_products'[Product Price Tier] IN {"Core Assortment", "Premium Assortment"}
+			    )
+			
+			-- 3. Keep sessions that mixed BOTH in the same cart
+			VAR MixedSessions = INTERSECT(EntrySessions, HigherTierSessions)
+			VAR CartCount = COUNTROWS(MixedSessions)
+			
+			-- 4. Count how many of these mixed sessions reached checkout
+			VAR CheckoutCount = 
+			    CALCULATE(
+			        DISTINCTCOUNT('Fact_Events'[session_id]),
+			        'Fact_Events'[event_name] = "begin_checkout",
+			        REMOVEFILTERS('Dim_products'),
+			        TREATAS(MixedSessions, 'Fact_Events'[session_id])
+			    )
+			
+			RETURN
+			    DIVIDE(CartCount - CheckoutCount, CartCount)
+			```
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: Funnel Measures
+		lineageTag: b29eae15-5b21-4984-84c4-decf1d9fa57b
+
+	measure 'Funnel Leakage %' =
+			
+			SWITCH (
+			    SELECTEDVALUE ( 'Funnel Stages'[Stage Order] ),
+			
+			    4, [Leakage % (View to Cart)],
+			    5, [Leakage % (Cart to Checkout)],
+			
+			    BLANK()
+			)
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: Funnel Measures
+		lineageTag: 343ffa85-7cc1-4228-b9d6-87ae4842e812
+
+	measure 'Funnel Leakage Color' =
+			
+			VAR Leakage =
+			    [Funnel Leakage %]
+			
+			RETURN
+			    SWITCH (
+			        TRUE(),
+			        ISBLANK(Leakage), "#A6A6A6",
+			        Leakage < 0.20, "#8B9D67",
+			        Leakage < 0.40, "#E05252",
+			        "#A61B1B"
+			    )
+		displayFolder: Funnel Measures
+		lineageTag: ab1b13d5-5487-4ccb-835b-cba6d75a3d3f
+
+	column Stage
+		lineageTag: 98818b73-57dd-45dc-a02b-2a6372f9936f
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Stage]
+		sortByColumn: 'Stage Order'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Stage Order'
+		formatString: 0
+		lineageTag: 762908df-8be2-4d1f-b605-bc425ba6ddc9
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Stage Order]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Funnel Stages' = calculated
+		mode: import
+		source =
+				
+				DATATABLE(
+				    "Stage", STRING,
+				    "Stage Order", INTEGER,
+				    {
+				        {"Session Start", 1},
+				        {"Page View", 2},
+				        {"View Item", 3},
+				        {"Add to Cart", 4},
+				        {"Begin Checkout", 5},
+				        {"Purchase", 6}
+				    }
+				)
+
+	annotation PBI_Id = 5bf2682a31254a11ab645f682e75b613
+

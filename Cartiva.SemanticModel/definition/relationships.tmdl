@@ -1,0 +1,64 @@
+relationship 0ab161be-8795-40bc-b488-57d4d3e190ba
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Dim_Customers.signup_date
+	toColumn: LocalDateTable_b04e4080-509a-4286-8f32-ffc9e59d36cd.Date
+
+relationship 80250e0e-eb9f-4a69-91a1-bf97ff08f741
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Dim_Customers.first_completed_date
+	toColumn: LocalDateTable_c8e8fc96-b69b-44ad-bf7b-53b3bb742599.Date
+
+relationship f2a95786-53af-41bc-b5ba-994d3749da0e
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Dim_Customers.last_completed_date
+	toColumn: LocalDateTable_51652b8e-6856-4add-9942-158055a1250d.Date
+
+relationship 46f71eed-82e2-4c81-85ca-37ba7dca87da
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Fact_Events.event_date
+	toColumn: LocalDateTable_d6511b8b-3325-44dc-8827-3de3c68aa8b8.Date
+
+relationship 9d7342a6-ccf8-4bb4-b204-9b7641b6d124
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Fact_Sales.order_date
+	toColumn: LocalDateTable_98a7525d-29a7-4b8a-9782-c042cbbaedb9.Date
+
+relationship dcd39ba9-7cc7-4d48-992a-9e2bf595e8a0
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Dim_Sessions.session_start
+	toColumn: LocalDateTable_8c120f17-8364-40eb-9747-cfa955fc7a76.Date
+
+relationship bfdd7d27-34c5-4fb0-ab20-70fa365c438f
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Dim_Sessions.session_end
+	toColumn: LocalDateTable_1fd3704d-b3e3-4435-916b-e91a925ceca5.Date
+
+relationship AutoDetected_924280b4-499a-407b-9cf8-98cad2214b5e
+	fromColumn: Fact_Events.user_id
+	toColumn: Dim_Customers.user_id
+
+relationship AutoDetected_e7a12dfb-d8d1-40f6-b270-cbe05aeefd64
+	fromColumn: Fact_Sales.user_id
+	toColumn: Dim_Customers.user_id
+
+relationship AutoDetected_3e7d9d13-0618-437e-a952-a42d89df39d7
+	fromColumn: Fact_Events.session_id
+	toColumn: Dim_Sessions.session_id
+
+relationship AutoDetected_06f6df4c-7062-48b1-ab63-54a6bd66f624
+	fromColumn: Fact_Sales.product_id
+	toColumn: Dim_products.product_id
+
+relationship 7e4a6eea-28da-d664-c8e6-bafc903e30e4
+	fromColumn: Fact_Events.product_id
+	toColumn: Dim_products.product_id
+
+relationship 50b52e5c-6127-cd1d-ee39-51553732907e
+	fromColumn: Fact_Sales.session_id
+	toColumn: Dim_Sessions.session_id
+
+relationship 0a46f34f-0cdb-4f8a-9076-de86cbe5b8e6
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Fact_Events.'Event Date time'
+	toColumn: LocalDateTable_a53a7a28-3e44-4820-b47b-297647ab9462.Date
+
