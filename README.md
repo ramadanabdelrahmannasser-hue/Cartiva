@@ -1,5 +1,7 @@
 # Cartiva - E-commerce Product Analytics
 
+![Cartiva Overview Dashboard](Dashboard%20Designs/Cartiva_Overview_Dashboard.jpg)
+
 > **Project Status: In Progress**  
 > The **Overview Dashboard** is fully completed and operational. Supporting analytical pages (deep-dive Funnel Analysis, Customer Health & Cohort retention, and Assortment/Channel diagnostics) are currently in active development.
 
