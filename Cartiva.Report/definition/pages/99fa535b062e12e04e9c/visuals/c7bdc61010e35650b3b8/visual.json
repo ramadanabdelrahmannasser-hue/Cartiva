@@ -2,8 +2,8 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
   "name": "c7bdc61010e35650b3b8",
   "position": {
-    "x": 615.71428571428578,
-    "y": 645.71428571428578,
+    "x": 586.66666666666674,
+    "y": 708.33333333333337,
     "z": 4000,
     "height": 282.85714285714289,
     "width": 631.42857142857144,
@@ -99,5 +99,37 @@
       ]
     },
     "drillFilterOtherVisuals": true
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "c73848a3101b01c91508",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "Dim_Customers"
+              }
+            },
+            "Property": "acquisition_source"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "0a79b1fdd1001869410e",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "Dim_Customers"
+              }
+            },
+            "Property": "Total users"
+          }
+        },
+        "type": "Advanced"
+      }
+    ]
   }
 }

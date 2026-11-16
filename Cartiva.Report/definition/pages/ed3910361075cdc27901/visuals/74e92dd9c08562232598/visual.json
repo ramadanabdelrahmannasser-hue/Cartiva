@@ -4,10 +4,10 @@
   "position": {
     "x": 853.76558603491264,
     "y": 479.40149625935163,
-    "z": 7001,
+    "z": 8000,
     "height": 227.13216957605985,
     "width": 403.09226932668327,
-    "tabOrder": 7001
+    "tabOrder": 8000
   },
   "visual": {
     "visualType": "donutChart",
@@ -221,5 +221,37 @@
       ]
     },
     "drillFilterOtherVisuals": true
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "5cd074eab37b9d01ec62",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "Dim_Customers"
+              }
+            },
+            "Property": "dynamic_churn_status"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "acef0385c1ecedc74240",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "Fact_Events"
+              }
+            },
+            "Property": "Total Sessions"
+          }
+        },
+        "type": "Advanced"
+      }
+    ]
   }
 }

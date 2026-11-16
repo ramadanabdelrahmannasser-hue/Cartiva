@@ -25,6 +25,90 @@ table Dim_Customers
 		formatString: 0.00%;-0.00%;0.00%
 		lineageTag: a5c95d6b-3039-40e0-bf2f-b9f5da04deef
 
+	measure 'Total Customer Leakage %' = ```
+			
+			VAR _LeakedCustomers = 
+			    CALCULATE(
+			        DISTINCTCOUNT(Dim_Customers[user_id]),
+			        Dim_Customers[dynamic_churn_status] IN {"Never Bought", "At-Risk", "Churned"}
+			    )
+			VAR _TotalCustomers = 
+			    COUNTROWS(Dim_Customers)
+			RETURN 
+			    DIVIDE(_LeakedCustomers, _TotalCustomers, 0)
+			```
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: c2716266-8777-47a0-9357-6a625ac3a362
+
+	measure 'Total Leakage Subtitle' =
+			
+			"Including Never Bought, At-Risk & Churned"
+		lineageTag: b85efe62-33b9-4d3e-bd08-215ff1e50e73
+
+	measure 'Active Non-Buyers' =
+			
+			CALCULATE(
+			    DISTINCTCOUNT(Dim_Customers[user_id]),
+			    Dim_Customers[dynamic_churn_status] = "Never Bought",
+			    Dim_Customers[Activity Churn Status]= "Active Browser"
+			)
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		lineageTag: bade8a74-b625-4c75-b400-c664f38f2a4e
+
+	measure 'Active Non-Buyers Subtitle' =
+			
+			"$5.52M Untapped Revenue" & UNICHAR(10) & "(at 30% Target Conv.)"
+		lineageTag: a46e8be9-6ccb-496f-8e7e-030a31ded8d8
+
+	measure 'Structural VIP Churn %' = ```
+			
+			VAR _RiskChurnVIP = 
+			    CALCULATE(
+			        DISTINCTCOUNT(Dim_Customers[user_id]),
+			        Dim_Customers[Customer Spending Tier] = "VIP",
+			        Dim_Customers[dynamic_churn_status] IN {"At-Risk", "Churned"}
+			    )
+			VAR _TotalVIP = 
+			    CALCULATE(
+			        DISTINCTCOUNT(Dim_Customers[user_id]),
+			        Dim_Customers[Customer Spending Tier] = "VIP"
+			    )
+			RETURN 
+			    DIVIDE(_RiskChurnVIP, _TotalVIP, 0)
+			```
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: d80112b4-43f1-4428-9a02-f75ea1c12e67
+
+	measure 'Wasted Paid CAC' = ```
+			
+			VAR _WastedAccounts = 
+			    CALCULATE(
+			        DISTINCTCOUNT(Dim_Customers[user_id]),
+			        Dim_Customers[dynamic_churn_status] IN {"Never Bought", "Churned"},
+			        Dim_Customers[acquisition_source] IN {"Paid Search", "Paid Social"} 
+			        -- تأكد من اسم عمود مصدر الزيارات في جدولك (قد يكون traffic_source)
+			    )
+			VAR _EstimatedCAC = 15 -- متوسط تكلفة الاستحواذ بالدولار
+			RETURN 
+			    _WastedAccounts * _EstimatedCAC
+			```
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		lineageTag: cf455032-118e-4cd4-9ea7-eabb36cb14c5
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure '% of Total Customers' =
+			
+			DIVIDE(
+			    [Total users],
+			    CALCULATE([Total users], ALL(Dim_Customers)),
+			    0
+			)
+		formatString: 0.00%;-0.00%;"-"
+		lineageTag: 8f9b08d2-1001-46e8-9d5d-e78af19984a7
+
+		annotation PBI_FormatHint = {"isCustom":true}
+
 	column user_id
 		dataType: int64
 		formatString: 0
@@ -188,10 +272,10 @@ table Dim_Customers
 			    -- Classify customers into statistical Quartile tiers based on purchasing power
 			    SWITCH(
 			        TRUE(),
-			        'Dim_Customers'[total_completed_orders] = 0, " Non-Buyer",
-			        UserAOV >= Q3_Threshold, "VIP / High Spender ",
-			        UserAOV >= Q1_Threshold, "Mid-Tier / Standard ",
-			        "Budget / Price-Sensitive "
+			        'Dim_Customers'[total_completed_orders] = 0, "Non-Buyer",
+			        UserAOV >= Q3_Threshold, "VIP",
+			        UserAOV >= Q1_Threshold, "Standard",
+			        "Budget"
 			    )
 			```
 		lineageTag: e1f023ce-9784-415a-bc07-332d59d18a9c
@@ -225,6 +309,42 @@ table Dim_Customers
 			    )
 			```
 		lineageTag: 2f944357-0d17-41d0-a8c1-3a062b2da06c
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column Lost_NonBuyers_Paid_Last_Assortment = ```
+			
+			VAR CurrentUser = Dim_Customers[user_id]
+			
+			-- 1. التأكد إن العميل حساب ميت (Never Bought + Activity Churned) وكمان جاي من Paid
+			VAR IsDeadAndPaid = 
+			    Dim_Customers[dynamic_churn_status] = "Never Bought" && 
+			    Dim_Customers[Activity Churn Status] = "Activity Churned" &&
+			    (Dim_Customers[acquisition_source] = "Paid Search" || Dim_Customers[acquisition_source] = "Paid Social")
+			
+			-- 2. جلب آخر شريحة تسعيرية (Assortment) شافها العميل قبل ما يمشي
+			VAR LastAssortment = 
+			    MAXX(
+			        TOPN(
+			            1,
+			            FILTER(
+			                Fact_Events,
+			                RELATED(Dim_Sessions[user_id]) = CurrentUser && 
+			                (Fact_Events[event_name] = "view_item" || Fact_Events[event_name] = "View Item")
+			            ),
+			            Fact_Events[Event Date time], 
+			            DESC
+			        ),
+			        -- استدعاء عمود التسعير (Premium, Core, Entry-Level)
+			        RELATED(Dim_products[Product Price Tier]) 
+			    )
+			
+			-- 3. إرجاع النتيجة للعملاء المستهدفين فقط
+			RETURN 
+			    IF(IsDeadAndPaid, LastAssortment, BLANK())
+			```
+		lineageTag: 98c148f7-ad40-4a78-9335-8c33b7eee617
 		summarizeBy: none
 
 		annotation SummarizationSetBy = Automatic

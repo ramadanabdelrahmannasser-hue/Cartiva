@@ -34,6 +34,63 @@ table Fact_Sales
 
 		annotation 43dbc3e8-3a1c-4b6f-9923-b49ff7d6691c = True
 
+	measure 'Total __users' =
+			
+			DISTINCTCOUNT(Fact_Sales[user_id])
+		formatString: 0
+		lineageTag: 5bbf4daf-0d84-4e15-9e7a-71d2b76c9226
+
+	measure 'First Purchase Orders' =
+			
+			CALCULATE(
+			    [Completed Orders],
+			    Fact_Sales[order_lifecycle_tag]
+			        IN {
+			            "Immediate First Purchase",
+			            "Delayed First Purchase"
+			        }
+			)
+		formatString: 0
+		lineageTag: 0da79b5e-bc94-4887-8e70-d0f7206407c8
+
+	measure 'Total Lifecycle Orders' =
+			
+			[First Purchase Orders] + [Repeat Purchase Orders]
+		lineageTag: 8fc69563-cbad-4769-a668-9f73ad52f14c
+
+	measure '% of Total Orders' =
+			
+			DIVIDE(
+			    [Completed Orders],
+			    [Total Lifecycle Orders],
+			    0
+			)
+		lineageTag: ef8dffa0-84c2-45e8-8476-b95bc7687057
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Repeat Purchase Orders' =
+			
+			CALCULATE(
+			    [Completed Orders],
+			   Fact_Sales[order_lifecycle_tag] = "Repeat Purchase"
+			)
+		formatString: 0
+		lineageTag: 5e074baf-7962-4b42-953a-d80bb11e424a
+
+	measure 'Repeat Orders % Label' =
+			
+			FORMAT(
+			    DIVIDE(
+			        [Repeat Purchase Orders],
+			        [Total Lifecycle Orders],
+			        0
+			    ),
+			    "0.0%"
+			)
+			& " Repeat Orders"
+		lineageTag: 3690dd57-f6af-4bf2-bfa6-d5a744d4c252
+
 	column order_item_id
 		dataType: int64
 		formatString: 0
@@ -148,6 +205,18 @@ table Fact_Sales
 		lineageTag: 0d27707e-c816-4d15-9dbc-12c8b07a629b
 		summarizeBy: none
 		sourceColumn: order_lifecycle_tag
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Order Type' =
+			
+			IF(
+			  Fact_Sales[order_lifecycle_tag] = "Repeat Purchase",
+			    "Repeat Purchase",
+			    "First Purchase"
+			)
+		lineageTag: 37f237ac-32c2-499d-937b-a0f240b7dacb
+		summarizeBy: none
 
 		annotation SummarizationSetBy = Automatic
 

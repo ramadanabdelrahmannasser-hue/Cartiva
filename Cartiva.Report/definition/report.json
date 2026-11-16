@@ -11,7 +11,7 @@
       "type": "SharedResources"
     },
     "customTheme": {
-      "name": "Custom6982339020175516.json",
+      "name": "Custom29372866217630833.json",
       "reportVersionAtImport": {
         "visual": "2.14.0",
         "report": "3.4.0",
@@ -40,7 +40,7 @@
           "expanded": {
             "expr": {
               "Literal": {
-                "Value": "false"
+                "Value": "true"
               }
             }
           }
@@ -68,8 +68,13 @@
       "type": "RegisteredResources",
       "items": [
         {
-          "name": "Custom6982339020175516.json",
-          "path": "Custom6982339020175516.json",
+          "name": "Cartiva___Customer_Intelligenc7301532654536226.png",
+          "path": "Cartiva___Customer_Intelligenc7301532654536226.png",
+          "type": "Image"
+        },
+        {
+          "name": "Custom29372866217630833.json",
+          "path": "Custom29372866217630833.json",
           "type": "CustomTheme"
         },
         {

@@ -4,7 +4,7 @@
     {
       "ordinal": 0,
       "scrollPosition": {
-        "x": 452.5274675114793,
+        "x": 0,
         "y": 0
       },
       "nodes": [
@@ -75,10 +75,11 @@
         },
         {
           "location": {
-            "x": 1391.2214938137479,
-            "y": 333.00353267450311
+            "x": 1710.102473813748,
+            "y": 885.73056467450306
           },
           "nodeIndex": "Funnel Stages",
+          "nodeLineageTag": "40d83669-854e-41dd-8ccb-b50462058065",
           "size": {
             "height": 200,
             "width": 234
@@ -87,8 +88,8 @@
         },
         {
           "location": {
-            "x": 1632.4827885487748,
-            "y": 371.4592712200087
+            "x": 1689.1727405487748,
+            "y": 1129.6873792200088
           },
           "nodeIndex": "Monthly Sales Metrics ",
           "nodeLineageTag": "358846d7-4373-4975-afb2-5cc8c53ea7f2",
@@ -100,8 +101,8 @@
         },
         {
           "location": {
-            "x": 1873.7440832838017,
-            "y": 371.4592712200087
+            "x": 1703.6742272838017,
+            "y": 679.71088522000878
           },
           "nodeIndex": "- How Healthy Is Our Customer Base?",
           "nodeLineageTag": "02c98c6e-513f-4a51-a240-a9e0b7505743",
@@ -113,7 +114,7 @@
         }
       ],
       "name": "All tables",
-      "zoomValue": 79.553182037699813,
+      "zoomValue": 56.447393005377755,
       "pinKeyFieldsToTop": false,
       "showExtraHeaderInfo": false,
       "hideKeyFieldsWhenCollapsed": false,
