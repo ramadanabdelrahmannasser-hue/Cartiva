@@ -292,4 +292,8 @@ Double-click `Cartiva.pbip` to open the semantic model and report canvas in Powe
     ├── vw_dim_users_enriched.sql    # User cohorts, LTV tiers & churn benchmarks
     ├── vw_fact_events_enriched.sql  # 6-stage funnel mapping & window sequencing
     └── vw_fact_sales_enriched.sql   # Order lifecycle classification
+<<<<<<< HEAD
 ```
+=======
+```
+>>>>>>> 090a0d310871bcffc9f0d7b9c21df31bfb22b87e
