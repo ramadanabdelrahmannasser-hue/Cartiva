@@ -522,34 +522,6 @@
             }
           ]
         }
-      },
-      {
-        "name": "b99d3423d79002bc4256",
-        "field": {
-          "Column": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "Dim_Customers"
-              }
-            },
-            "Property": "acquisition_source"
-          }
-        },
-        "type": "Categorical"
-      },
-      {
-        "name": "c0562bcd200a5cb0771b",
-        "field": {
-          "Measure": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "Dim_Customers"
-              }
-            },
-            "Property": "Total users"
-          }
-        },
-        "type": "Advanced"
       }
     ]
   }

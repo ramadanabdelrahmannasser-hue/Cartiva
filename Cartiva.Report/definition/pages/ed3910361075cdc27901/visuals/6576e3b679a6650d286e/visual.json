@@ -278,5 +278,23 @@
       ]
     },
     "drillFilterOtherVisuals": true
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "92c911aed0aadb2b2704",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "Monthly Sales Metrics "
+              }
+            },
+            "Property": "Monthly Sales Metrics "
+          }
+        },
+        "type": "Categorical"
+      }
+    ]
   }
 }

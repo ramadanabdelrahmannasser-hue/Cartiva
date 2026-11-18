@@ -278,23 +278,5 @@
       ]
     },
     "drillFilterOtherVisuals": true
-  },
-  "filterConfig": {
-    "filters": [
-      {
-        "name": "98d8fa83ab88eab0ddce",
-        "field": {
-          "Measure": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "Dim_Customers"
-              }
-            },
-            "Property": "Wasted Paid CAC"
-          }
-        },
-        "type": "Advanced"
-      }
-    ]
   }
 }

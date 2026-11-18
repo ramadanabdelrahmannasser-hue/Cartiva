@@ -723,34 +723,6 @@
             }
           ]
         }
-      },
-      {
-        "name": "35e4df397e5e2a02ae16",
-        "field": {
-          "Column": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "Dim_Customers"
-              }
-            },
-            "Property": "Customer Spending Tier"
-          }
-        },
-        "type": "Categorical"
-      },
-      {
-        "name": "618be61a0a0630835a62",
-        "field": {
-          "Measure": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "Dim_Customers"
-              }
-            },
-            "Property": "Total users"
-          }
-        },
-        "type": "Advanced"
       }
     ]
   }

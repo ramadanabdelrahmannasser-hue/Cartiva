@@ -1,6 +1,7 @@
 model Model
 	culture: en-US
 	defaultPowerBIDataSourceVersion: powerBI_V3
+	discourageImplicitMeasures
 	sourceQueryCulture: en-US
 	valueFilterBehavior: independent
 	dataAccessOptions
@@ -12,6 +13,8 @@ annotation __PBI_TimeIntelligenceEnabled = 1
 annotation PBI_QueryOrder = ["Dim_Customers","Fact_Events","Fact_Sales","Dim_products","Dim_Sessions"]
 
 annotation PBI_ProTooling = ["DevMode"]
+
+annotation __TEdtr = 1
 
 ref table Dim_Customers
 ref table DateTableTemplate_aba8e487-5f5f-4755-8040-87687a7c58d0
@@ -30,6 +33,7 @@ ref table 'Funnel Stages'
 ref table LocalDateTable_a53a7a28-3e44-4820-b47b-297647ab9462
 ref table 'Monthly Sales Metrics '
 ref table '- How Healthy Is Our Customer Base?'
+ref table 'Funnel Metrics'
 
 ref cultureInfo en-US
 

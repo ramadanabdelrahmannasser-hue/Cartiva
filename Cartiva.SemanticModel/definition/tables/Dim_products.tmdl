@@ -46,6 +46,16 @@ table Dim_products
 			```
 		lineageTag: b393f7eb-11d3-435a-9953-93082063e65b
 
+	measure 'View Items Count' =
+			
+			CALCULATE(
+			    DISTINCTCOUNT(Fact_Events[session_id]),
+			    Fact_Events[event_name] = "view_item"
+			)
+		lineageTag: 3028f4f9-413e-4d80-b1e5-84b916d5fc65
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
 	column product_id
 		dataType: int64
 		formatString: 0

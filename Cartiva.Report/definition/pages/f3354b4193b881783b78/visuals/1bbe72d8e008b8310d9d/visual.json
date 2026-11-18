@@ -294,23 +294,5 @@
       ]
     },
     "drillFilterOtherVisuals": true
-  },
-  "filterConfig": {
-    "filters": [
-      {
-        "name": "3aaac0cd04a8c46749db",
-        "field": {
-          "Measure": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "Dim_Customers"
-              }
-            },
-            "Property": "Active Non-Buyers"
-          }
-        },
-        "type": "Advanced"
-      }
-    ]
   }
 }

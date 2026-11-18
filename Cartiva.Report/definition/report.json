@@ -40,7 +40,7 @@
           "expanded": {
             "expr": {
               "Literal": {
-                "Value": "true"
+                "Value": "false"
               }
             }
           }
@@ -70,6 +70,11 @@
         {
           "name": "Cartiva___Customer_Intelligenc7301532654536226.png",
           "path": "Cartiva___Customer_Intelligenc7301532654536226.png",
+          "type": "Image"
+        },
+        {
+          "name": "Cartiva___Funnel_Analysis8858760598427998.png",
+          "path": "Cartiva___Funnel_Analysis8858760598427998.png",
           "type": "Image"
         },
         {

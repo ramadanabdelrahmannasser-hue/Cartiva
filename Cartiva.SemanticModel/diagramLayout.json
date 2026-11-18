@@ -4,8 +4,8 @@
     {
       "ordinal": 0,
       "scrollPosition": {
-        "x": 0,
-        "y": 0
+        "x": 369.98589016639852,
+        "y": 204.05282427358947
       },
       "nodes": [
         {
@@ -29,7 +29,7 @@
           "nodeIndex": "Dim_products",
           "nodeLineageTag": "af850999-c776-4e69-b033-dd8cd3e28998",
           "size": {
-            "height": 200,
+            "height": 229.15040346765556,
             "width": 234
           },
           "zIndex": 0
@@ -111,10 +111,23 @@
             "width": 234
           },
           "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 2235.3637685487747,
+            "y": 576.84368961000439
+          },
+          "nodeIndex": "Funnel Metrics",
+          "nodeLineageTag": "5c425103-94a7-472e-9ceb-b059ce2cd26b",
+          "size": {
+            "height": 128,
+            "width": 234
+          },
+          "zIndex": 0
         }
       ],
       "name": "All tables",
-      "zoomValue": 56.447393005377755,
+      "zoomValue": 89.192590520569553,
       "pinKeyFieldsToTop": false,
       "showExtraHeaderInfo": false,
       "hideKeyFieldsWhenCollapsed": false,

@@ -1,0 +1,51 @@
+table 'Funnel Metrics'
+	lineageTag: 5c425103-94a7-472e-9ceb-b059ce2cd26b
+
+	calculationGroup
+		precedence: 1
+
+		calculationItem Volume = SELECTEDMEASURE()
+
+		calculationItem 'Leakage %' = ```
+				
+				VAR CurrentStage = SELECTEDVALUE('Funnel Stages'[Stage Order])
+				VAR CurrentVolume = SELECTEDMEASURE()
+				VAR PrevVolume = 
+				    CALCULATE (
+				        SELECTEDMEASURE(),
+				        REMOVEFILTERS('Funnel Stages'),
+				        'Funnel Stages'[Stage Order] = CurrentStage - 1
+				    )
+				RETURN 
+				    IF (
+				        CurrentStage > 1,
+				        DIVIDE ( PrevVolume - CurrentVolume, PrevVolume ),
+				        BLANK()
+				    )
+				
+				```
+
+			formatStringDefinition = "0.00%"
+
+	measure 'Category Views' =
+			
+			CALCULATE(
+			    [Funnel Sessions], -- استبدله باسم المقياس الأساسي للجلسات عندك
+			    'Funnel Stages'[Stage Order] = 1 -- رقم أو اسم مرحلة عرض المنتج (View Item)
+			)
+		lineageTag: 8e6fe432-8852-4f08-88ee-048325fbfcd7
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Name
+		dataType: string
+		lineageTag: ff7680c1-f633-47d3-876e-a0e47bfddb23
+		sourceColumn: Name
+		sortByColumn: Ordinal
+
+	column Ordinal
+		dataType: int64
+		isHidden
+		lineageTag: 456c5e26-2e3e-4e1a-8c55-1f8e5567284c
+		sourceColumn: Ordinal
+

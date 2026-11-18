@@ -764,51 +764,5 @@
       ]
     },
     "drillFilterOtherVisuals": true
-  },
-  "filterConfig": {
-    "filters": [
-      {
-        "name": "c6ab82a45b160621c007",
-        "field": {
-          "Column": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "Dim_Customers"
-              }
-            },
-            "Property": "dynamic_churn_status"
-          }
-        },
-        "type": "Categorical"
-      },
-      {
-        "name": "74de9c106a84839a4006",
-        "field": {
-          "Measure": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "Dim_Customers"
-              }
-            },
-            "Property": "% of Total Customers"
-          }
-        },
-        "type": "Advanced"
-      },
-      {
-        "name": "8ba4bcbd2430cb1a0db8",
-        "field": {
-          "Column": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "Dim_Customers"
-              }
-            },
-            "Property": "Activity Churn Status"
-          }
-        },
-        "type": "Categorical"
-      }
-    ]
   }
 }

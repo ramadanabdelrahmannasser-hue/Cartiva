@@ -267,17 +267,25 @@ table 'Funnel Stages'
 
 	measure 'Funnel Leakage %' =
 			
+			
 			SWITCH (
+			
 			    SELECTEDVALUE ( 'Funnel Stages'[Stage Order] ),
 			
+			
+			
 			    4, [Leakage % (View to Cart)],
+			
 			    5, [Leakage % (Cart to Checkout)],
+			
+			
 			
 			    BLANK()
 			)
-		formatString: 0.00%;-0.00%;0.00%
 		displayFolder: Funnel Measures
 		lineageTag: 343ffa85-7cc1-4228-b9d6-87ae4842e812
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	measure 'Funnel Leakage Color' =
 			
@@ -294,6 +302,91 @@ table 'Funnel Stages'
 			    )
 		displayFolder: Funnel Measures
 		lineageTag: ab1b13d5-5487-4ccb-835b-cba6d75a3d3f
+
+	measure 'Checkout Drop-off %' =
+			VAR CurrentSessions = VALUES(Dim_Sessions[session_id])
+			VAR CartSessions = CALCULATE(DISTINCTCOUNT(Fact_Events[session_id]), Fact_Events[event_name] = "add_to_cart", TREATAS(CurrentSessions, Fact_Events[session_id]))
+			VAR CheckoutSessions = CALCULATE(DISTINCTCOUNT(Fact_Events[session_id]), Fact_Events[event_name] = "begin_checkout", TREATAS(CurrentSessions, Fact_Events[session_id]))
+			RETURN DIVIDE(CartSessions - CheckoutSessions, CartSessions)
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: Funnel Measures
+		lineageTag: 4320a172-b5b8-4ae1-8e1c-1ae643ef37aa
+
+	measure 'New Visitor Checkout Drop-off' = CALCULATE([Checkout Drop-off %], Dim_Sessions[Visitor Type] = "New Visitor")
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: Funnel Measures
+		lineageTag: 2e1d47b7-2364-4273-83b0-3468fc86c7ed
+
+	measure 'Purchase Failure Rate' =
+			VAR DeadNonBuyers = CALCULATETABLE(VALUES(Dim_Customers[user_id]), Dim_Customers[dynamic_churn_status] = "Never Bought", Dim_Customers[Activity Churn Status] = "Activity Churned")
+			VAR FailedPurchaseUsers = CALCULATE(DISTINCTCOUNT(Fact_Events[user_id]), Fact_Events[event_name] = "purchase", TREATAS(DeadNonBuyers, Fact_Events[user_id]))
+			RETURN DIVIDE(FailedPurchaseUsers, COUNTROWS(DeadNonBuyers))
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: Funnel Measures
+		lineageTag: b87fcc8a-7a3f-48e9-9666-20916a5cfd82
+
+	measure 'View-to-Cart Drop-off' = ```
+			
+			VAR CurrentSessions = VALUES(Dim_Sessions[session_id])
+			VAR ViewSessions = 
+			    CALCULATE(
+			        DISTINCTCOUNT(Fact_Events[session_id]),
+			        Fact_Events[event_name] = "view_item",
+			        TREATAS(CurrentSessions, Fact_Events[session_id])
+			    )
+			VAR CartSessions = 
+			    CALCULATE(
+			        DISTINCTCOUNT(Fact_Events[session_id]),
+			        Fact_Events[event_name] = "add_to_cart",
+			        TREATAS(CurrentSessions, Fact_Events[session_id])
+			    )
+			RETURN DIVIDE(ViewSessions - CartSessions, ViewSessions)
+			```
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: Funnel Measures
+		lineageTag: 8777f388-2119-427d-b483-c6ff90037954
+
+	measure 'Tier Checkout Drop-off' = ```
+			
+			VAR CartSessionsThisTier = 
+			    CALCULATETABLE(
+			        VALUES(Fact_Events[session_id]),
+			        Fact_Events[event_name] = "add_to_cart"
+			    )
+			    
+			VAR CheckoutSessions = 
+			    CALCULATE(
+			        DISTINCTCOUNT(Fact_Events[session_id]),
+			        Fact_Events[event_name] = "begin_checkout",
+			        REMOVEFILTERS('Dim_Products'),
+			        CartSessionsThisTier
+			    )
+			    
+			VAR CartCount = COUNTROWS(CartSessionsThisTier)
+			
+			RETURN 
+			    DIVIDE(CartCount - CheckoutSessions, CartCount)
+			```
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: fe02f2e2-9440-4248-ac93-fd3c87875ff0
+
+	measure 'Top 2 Category Color' = ```
+			
+			VAR CategoryRank = 
+			    RANKX(
+			        ALLSELECTED('Dim_products'[category]), 
+			        [Leakage % (View to Cart)], 
+			        , 
+			        DESC, 
+			        Dense
+			    )
+			RETURN
+			    IF(CategoryRank <= 2, "#D93836", "#A6A6A6")
+			```
+		displayFolder: Funnel Measures
+		lineageTag: 8113b38b-2105-468b-a73c-722bba439f7d
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	column Stage
 		lineageTag: 98818b73-57dd-45dc-a02b-2a6372f9936f

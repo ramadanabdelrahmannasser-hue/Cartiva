@@ -221,37 +221,5 @@
       ]
     },
     "drillFilterOtherVisuals": true
-  },
-  "filterConfig": {
-    "filters": [
-      {
-        "name": "5cd074eab37b9d01ec62",
-        "field": {
-          "Column": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "Dim_Customers"
-              }
-            },
-            "Property": "dynamic_churn_status"
-          }
-        },
-        "type": "Categorical"
-      },
-      {
-        "name": "acef0385c1ecedc74240",
-        "field": {
-          "Measure": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "Fact_Events"
-              }
-            },
-            "Property": "Total Sessions"
-          }
-        },
-        "type": "Advanced"
-      }
-    ]
   }
 }

@@ -2,9 +2,9 @@
 
 ![Cartiva Overview Dashboard](Dashboard%20Designs/Cartiva_Overview_Dashboard.jpg)
 
-> **Project Status: Active Development (Phase 1 Completed)**
+> **Project Status: Active Development**
 >
-> The **Executive Overview Dashboard**, SQL semantic layer, and Python ETL pipeline are fully deployed and operational. Deep-dive diagnostic views (**Customers & Cohort Retention** and **Funnel Diagnostics**) are actively being finalized in Power BI.
+> The **Executive Overview** and **Customers & Cohort Retention** dashboards, SQL semantic layer, and Python ETL pipeline are fully deployed and operational. The final deep-dive diagnostic view (**Funnel Diagnostics**) is actively being finalized in Power BI.
 
 ---
 
@@ -46,10 +46,12 @@ The report is architected as a modular 3-page SaaS application with a persistent
 
 ![Cartiva Overview Layout](Dashboard%20Designs/Cartiva_Overview_Layout.jpg)
 
+![Cartiva Customer Intelligence](Dashboard%20Designs/Cartiva_Customer_Intelligence.png)
+
 | Report Page | Status | Primary Commercial & Product Questions Answered | 
 | ----- | ----- | ----- | 
 | **1. Overview** | **Completed** | How are we performing against macro KPIs? Where is the steepest funnel drop-off occurring? What is the true health of our customer base when crossing purchase history with live browsing activity? | 
-| **2. Customers** | **In Progress** | How do our user cohorts behave across the Dual-Churn Matrix (`Purchase Churn × Activity Churn`)? How much historical LTV is at risk due to Structural VIP Churn? Which acquisition channels generate permanently dead accounts? | 
+| **2. Customers** | **Completed** | How do our user cohorts behave across the Dual-Churn Matrix (`Purchase Churn × Activity Churn`)? How much historical LTV is at risk due to Structural VIP Churn? Which acquisition channels generate permanently dead accounts? | 
 | **3. Funnel** | **In Progress** | How do specific user cohorts (New vs. Returning, Price Tiers, and Traffic Channels) experience funnel leakage? Why did the "Premium Price Shock" hypothesis fail, and what is causing the ~80% Paid Traffic collapse at `Begin Checkout`? | 
 
 ## 3. Analytical Methodologies & Cohort-Driven Diagnostics
@@ -140,16 +142,15 @@ To provide full engineering transparency on current deliverables versus upcoming
 │   ├── Enterprise Power BI Project (.pbip) with TMDL semantic model definitions
 │   ├── Core & Advanced DAX measure library (Dual-Churn matrix, Stage leakage %, Lost Paid Assortment trace)
 │   ├── Executive Overview Dashboard (KPIs, Monthly Trends, Funnel Drop-offs, Churn Split, Traffic Mix)
+│   ├── Page 2: Customers & Cohort Retention Dashboard (Dual-Churn matrix, VIP Structural Churn, CAC bleed)
 │   └── Executive Documentation PDFs (Strategic Blueprint & Important Findings Executive Brief)
 │
 ├── [IN PROGRESS — ACTIVE POWER BI BUILD]
-│   ├── Page 2: Customers & Cohort Retention Dashboard (Dual-Churn matrix, VIP Structural Churn, CAC bleed)
 │   └── Page 3: Funnel Diagnostics Dashboard (Cohort-sliced drop-offs by Visitor Type, Category & Price Tier)
 │
 └── [PLANNED — PHASE 2 ENHANCEMENTS]
     ├── Time-Based Monthly Cohort Retention Heatmap (12-month repeat purchase decay grid)
     └── A/B Test Statistical Calculator for Guest Checkout & Free-Shipping threshold experiments
-
 ```
 
 ## 6. Data Architecture & Star Schema Modeling
@@ -172,7 +173,6 @@ Cartiva is architected as a multi-fact **Star Schema** in Power BI, purposefully
                                                             ┌────────┴───────┴┐
                                                             │  Dim_Products   │
                                                             └─────────────────┘
-
 ```
 
 ### Why Separate `Fact_Events` and `Fact_Sales`?
@@ -211,7 +211,6 @@ Data ingestion and normalization are automated through a clean, modular Python p
 
 ```
 Operational DB  ──► [data_extraction.py] ──► [Data_cleaning.py] ──► [data_loading.py] ──► MySQL Analytics Warehouse
-
 ```
 
 - **Extraction (`data_extraction.py`):** Streams raw operational tables from MySQL using pooled `SQLAlchemy` connections.
@@ -241,7 +240,6 @@ Operational DB  ──► [data_extraction.py] ──► [Data_cleaning.py] ─�
 ```
 git clone https://github.com/ramadanabdelrahmannasser-hue/Cartiva.git
 cd Cartiva
-
 ```
 
 ### Step 2: Execute the Python ETL Pipeline
@@ -249,7 +247,6 @@ cd Cartiva
 ```
 pip install -r Python/requirements.txt
 python Python/main.py
-
 ```
 
 *(You will be securely prompted for your local MySQL credentials to initialize and populate the warehouse).*
@@ -262,7 +259,6 @@ Execute the semantic views in your MySQL environment in the following order:
 mysql -u root -p warehouse_db < SQL/vw_dim_users_enriched.sql
 mysql -u root -p warehouse_db < SQL/vw_fact_events_enriched.sql
 mysql -u root -p warehouse_db < SQL/vw_fact_sales_enriched.sql
-
 ```
 
 ### Step 4: Launch the Power BI Project (`.pbip`)
@@ -279,7 +275,8 @@ Double-click `Cartiva.pbip` to open the semantic model and report canvas in Powe
 ├── Dashboard Designs/               # UI screenshots, layout grids, and wireframes
 │   ├── Cartiva_Overview_Dashboard.jpg
 │   ├── Cartiva_Overview_Layout.jpg
-│   └── Cartiva_Overview_Wireframe.png
+│   ├── Cartiva_Overview_Wireframe.png
+│   └── Cartiva_Customer_Intelligence.png
 ├── Documentation/                   # Deep-dive executive blueprints & strategic documentation
 │   ├── Important_Findings.pdf
 │   ├── Cartiva_Project_Summary_and_Key_Insights.pdf
@@ -295,5 +292,4 @@ Double-click `Cartiva.pbip` to open the semantic model and report canvas in Powe
     ├── vw_dim_users_enriched.sql    # User cohorts, LTV tiers & churn benchmarks
     ├── vw_fact_events_enriched.sql  # 6-stage funnel mapping & window sequencing
     └── vw_fact_sales_enriched.sql   # Order lifecycle classification
-
 ```

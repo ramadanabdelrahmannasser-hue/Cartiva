@@ -257,23 +257,5 @@
       ]
     },
     "drillFilterOtherVisuals": true
-  },
-  "filterConfig": {
-    "filters": [
-      {
-        "name": "88e6a6642290e5d1e967",
-        "field": {
-          "Measure": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "Dim_Customers"
-              }
-            },
-            "Property": "Structural VIP Churn %"
-          }
-        },
-        "type": "Advanced"
-      }
-    ]
   }
 }

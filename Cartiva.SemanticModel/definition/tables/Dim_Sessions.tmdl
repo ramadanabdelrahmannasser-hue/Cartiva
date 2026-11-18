@@ -63,6 +63,12 @@ table Dim_Sessions
 
 		annotation SummarizationSetBy = Automatic
 
+	column 'Visitor Type' =
+			VAR CurrentUser = Dim_Sessions[user_id]
+			VAR FirstSession = CALCULATE(MIN(Dim_Sessions[session_start]), FILTER(ALL(Dim_Sessions), Dim_Sessions[user_id] = CurrentUser))
+			RETURN IF(Dim_Sessions[session_start] = FirstSession, "New Visitor", "Returning Visitor")
+		lineageTag: 42a9dfdd-367e-493c-9a15-45939b0baff5
+
 	partition Dim_Sessions = m
 		mode: import
 		source =

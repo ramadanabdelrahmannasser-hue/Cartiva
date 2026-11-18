@@ -7,6 +7,14 @@ table Fact_Events
 		formatString: 0
 		lineageTag: 3428602a-21f1-46ee-a4fd-37d0252b3b66
 
+	measure 'Lost Viewers Count' =
+			
+			[View Items Count] *
+			[Leakage % (View to Cart)]
+		lineageTag: f07e2bfd-27fe-4607-b58c-a790c4bbe9aa
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
 	column event_id
 		dataType: int64
 		formatString: 0

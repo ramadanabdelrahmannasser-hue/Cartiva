@@ -4,18 +4,15 @@
   "position": {
     "x": 854.44444444444446,
     "y": 185.55555555555554,
-    "z": 8001,
+    "z": 9000,
     "height": 236.66666666666666,
     "width": 425.55555555555554,
-    "tabOrder": 8001
+    "tabOrder": 9000
   },
   "visual": {
     "visualType": "donutChart",
     "query": {
       "queryState": {
-        "Category": {
-          "projections": []
-        },
         "Series": {
           "projections": [
             {
@@ -314,37 +311,5 @@
       ]
     },
     "drillFilterOtherVisuals": true
-  },
-  "filterConfig": {
-    "filters": [
-      {
-        "name": "ba040d4c13d429ad9023",
-        "field": {
-          "Column": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "Fact_Sales"
-              }
-            },
-            "Property": "Order Type"
-          }
-        },
-        "type": "Categorical"
-      },
-      {
-        "name": "6fabf60d71c194e56b0a",
-        "field": {
-          "Measure": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "Fact_Sales"
-              }
-            },
-            "Property": "Completed Orders"
-          }
-        },
-        "type": "Advanced"
-      }
-    ]
   }
 }
